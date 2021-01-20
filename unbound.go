@@ -136,7 +136,7 @@ func (u *Unbound) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg
 	RcodeCount.WithLabelValues(server, rc).Add(1)
 	RequestDuration.WithLabelValues(server).Observe(res.Rtt.Seconds())
 
-	if err != nil {
+	if err != nil || res.AnswerPacket.Question == nil {
 		return dns.RcodeServerFailure, err
 	}
 	if u.strict && res.Bogus {
