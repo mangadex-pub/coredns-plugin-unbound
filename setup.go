@@ -1,6 +1,7 @@
 package unbound
 
 import (
+	"errors"
 	"github.com/coredns/caddy"
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
@@ -43,12 +44,12 @@ func setup(c *caddy.Controller) error {
 	return nil
 }
 
-func normalizeHost(valueName string, hostStr string) string {
+func normalizeHost(valueName string, hostStr string) (*string, error) {
 	normalized := plugin.Host(hostStr).NormalizeExact()
 	if len(normalized) == 1 {
-		return normalized[0]
+		return &normalized[0], nil
 	} else {
-		panic("Invalid '" + valueName + "' value should be normalizable as a host: " + hostStr)
+		return nil, errors.New("Invalid '" + valueName + "' value should be normalizable as a host: " + hostStr)
 	}
 }
 
@@ -69,7 +70,12 @@ func unboundParse(c *caddy.Controller) (*Unbound, error) {
 			copy(u.from, c.ServerBlockKeys)
 		}
 		for i, str := range u.from {
-			u.from[i] = normalizeHost("from", str)
+			host, err := normalizeHost("from", str)
+			if err != nil {
+				return nil, err
+			} else {
+				u.from[i] = *host
+			}
 		}
 
 		for c.NextBlock() {
@@ -83,7 +89,12 @@ func unboundParse(c *caddy.Controller) (*Unbound, error) {
 					return nil, c.ArgErr()
 				}
 				for i := 0; i < len(except); i++ {
-					except[i] = normalizeHost("except", except[i])
+					host, err := normalizeHost("except", except[i])
+					if err != nil {
+						return nil, err
+					} else {
+						except[i] = *host
+					}
 				}
 				u.except = except
 			case "option":
