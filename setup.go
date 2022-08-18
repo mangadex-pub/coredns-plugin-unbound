@@ -46,10 +46,10 @@ func setup(c *caddy.Controller) error {
 
 func normalizeHost(valueName string, hostStr string) (*string, error) {
 	normalized := plugin.Host(hostStr).NormalizeExact()
-	if len(normalized) == 1 {
+	if len(normalized) == 1 && len(normalized[0]) > 0 {
 		return &normalized[0], nil
 	} else {
-		return nil, errors.New("Invalid '" + valueName + "' value should be normalizable as a host: " + hostStr)
+		return nil, errors.New("Invalid '" + valueName + "' value should be normalizable as a non-empty domain name: " + hostStr)
 	}
 }
 

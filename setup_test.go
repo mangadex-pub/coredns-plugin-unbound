@@ -55,6 +55,15 @@ func TestSetupExtended(t *testing.T) {
 		{`unbound {
 			config testdata/unbound.conf.bad
 		}`, true},
+		{`unbound :8080 {
+			config testdata/unbound.conf.good
+		}`, true},
+		{`unbound mangadex.org {
+			config testdata/unbound.conf.good
+		}`, false},
+		{`unbound . {
+			config testdata/unbound.conf.good
+		}`, false},
 		{`unbound {
 			config testdata/unbound.conf.good
 		}`, false},
