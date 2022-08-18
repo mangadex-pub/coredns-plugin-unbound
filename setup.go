@@ -43,6 +43,15 @@ func setup(c *caddy.Controller) error {
 	return nil
 }
 
+func normalizeHost(valueName string, hostStr string) string {
+	normalized := plugin.Host(hostStr).NormalizeExact()
+	if len(normalized) == 1 {
+		return normalized[0]
+	} else {
+		panic("Invalid '" + valueName + "' value should be normalizable as a host: " + hostStr)
+	}
+}
+
 func unboundParse(c *caddy.Controller) (*Unbound, error) {
 	u := New()
 
@@ -60,7 +69,7 @@ func unboundParse(c *caddy.Controller) (*Unbound, error) {
 			copy(u.from, c.ServerBlockKeys)
 		}
 		for i, str := range u.from {
-			u.from[i] = plugin.Host(str).Normalize()
+			u.from[i] = normalizeHost("from", str)
 		}
 
 		for c.NextBlock() {
@@ -74,7 +83,7 @@ func unboundParse(c *caddy.Controller) (*Unbound, error) {
 					return nil, c.ArgErr()
 				}
 				for i := 0; i < len(except); i++ {
-					except[i] = plugin.Host(except[i]).Normalize()
+					except[i] = normalizeHost("except", except[i])
 				}
 				u.except = except
 			case "option":
