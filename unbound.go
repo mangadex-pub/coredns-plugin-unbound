@@ -2,8 +2,9 @@ package unbound
 
 import (
 	"context"
-	"fmt"
 	"errors"
+	"fmt"
+	"github.com/mangadex-pub/go-libunbound"
 	"strconv"
 
 	"github.com/coredns/coredns/plugin"
@@ -12,7 +13,6 @@ import (
 	"github.com/coredns/coredns/request"
 
 	"github.com/miekg/dns"
-	"github.com/miekg/unbound"
 )
 
 var log = clog.NewWithPlugin("unbound")
